@@ -7,18 +7,18 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.microsoft.azure', name: 'azure-webapp-gradle-plugin',
-                version: '1.0-SNAPSHOT'
+        classpath group: 'lenala.azure', name: 'azure-webapp-gradle-plugin',
+                version: '1.0.1'
         classpath 'io.spring.gradle:dependency-management-plugin:1.0.5.RELEASE'
         classpath "org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE"
-        classpath 'com.bmuschko:gradle-cargo-plugin:2.3'
+        classpath 'com.bmuschko:gradle-cargo-plugin:2.7.0'
     }
 }
 
 apply plugin: 'war'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "org.springframework.boot"
-apply plugin: 'com.microsoft.azure.azurewebapp'
+apply plugin: 'lenala.azure.azurewebapp'
 apply plugin: 'com.bmuschko.cargo'
 
 
@@ -37,7 +37,7 @@ dependencies {
 }
 
 cargo {
-    containerId = 'tomcat8x'
+    containerId = 'tomcat9x'
     deployable {
         context = 'todoapp'
     }
@@ -47,22 +47,23 @@ cargo {
     }
 }
 
-azurewebapp {
-    deploymentType = 'wardeploy'
+azureWebApp {
     resourceGroup = "${System.env.WEBAPP_RESOURCE_GROUP}"
     appName = "${System.env.WEBAPP_NAME}"
     pricingTier = "S2"
-    authFile = file('/Users/farlen/stuff/my2.azureauth')
-    // if 'target' is not specified, dafault output of the 'war' plugin will be used
-//    target = file('C:/stuff/azure-gradle-plugins.4/samples/todo-app-java-on-azure.appservice-on-linux/build/libs/todoapp.war')
-    appServiceOnLinux = {
+    appService = {
+        type = 'linux'
         runtimeStack = 'TOMCAT 9.0-jre8'
-//        urlPath = 'todoapp'
     }
-//    appServiceOnWindows = {
-//        javaWebContainer = "tomcat 8.5"
-//        javaVersion = "1.8.0_102"
-//        urlPath = 'todoapp'
-//    }
+    authentication = {
+        type = "file"
+        file = '/Users/elakhno/stuff/gradle/my.azureauth'
+    }
+    deployment = {
+        type = "war"
+        // if 'warFile' is not specified, default output of the 'war' plugin will be used
+        // warFile = '<path_to_war_file>'
+        contextPath = 'todoapp'
+    }
 }
 
